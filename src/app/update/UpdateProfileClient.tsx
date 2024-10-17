@@ -4,6 +4,7 @@ import { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { FaCheckCircle } from "react-icons/fa";
+import { image } from "framer-motion/client";
 
 const usersData = require("/public/data.json");
 
@@ -54,6 +55,7 @@ const UpdateProfileClient = () => {
     dateDeNaissance: "",
     adresse: "",
     numeroDeTelephone: "",
+    image: "",
   });
 
   const [isUpdated, setIsUpdated] = useState(false);
@@ -75,6 +77,7 @@ const UpdateProfileClient = () => {
               dateDeNaissance: user.dateDeNaissance || "",
               adresse: user.adresse || "",
               numeroDeTelephone: user.numeroDeTelephone || "",
+              image: user.image || session.user.image || "",
             });
           } else {
             const fullName = session.user.name || "";
@@ -89,6 +92,7 @@ const UpdateProfileClient = () => {
               dateDeNaissance: "",
               adresse: "",
               numeroDeTelephone: "",
+              image: session.user.image || "",
             });
           }
         } catch (error) {
@@ -192,9 +196,7 @@ const UpdateProfileClient = () => {
       setIsUpdated(true);
     } catch (error) {
       console.error("Erreur:", error);
-      setErrorMessages([
-        "Une erreur est survenue : " + (error),
-      ]);
+      setErrorMessages(["Une erreur est survenue : " + error]);
     } finally {
       setLoading(false);
     }
@@ -208,7 +210,6 @@ const UpdateProfileClient = () => {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <div className="text-xl text-center">Chargement en cours...</div>
-        {/* Ici, vous pouvez ajouter un spinner ou une animation de chargement si souhaité */}
       </div>
     );
   }
@@ -222,7 +223,18 @@ const UpdateProfileClient = () => {
         <h1 className="text-3xl font-bold mb-6 text-center">
           Mettre à jour le profil
         </h1>
+
         <form onSubmit={handleSubmit} className="space-y-4">
+          {formData.image && (
+            <div className="flex justify-center mb-4">
+              <img
+                src={formData.image}
+                alt="Profile"
+                className="w-24 h-24 rounded-full"
+              />
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium mb-2">Prénom</label>
@@ -245,6 +257,7 @@ const UpdateProfileClient = () => {
               />
             </div>
           </div>
+
           <div>
             <label className="block text-sm font-medium mb-2">Email</label>
             <input
@@ -256,6 +269,7 @@ const UpdateProfileClient = () => {
               disabled
             />
           </div>
+
           <div>
             <label className="block text-sm font-medium mb-2">
               Date de naissance
@@ -268,6 +282,7 @@ const UpdateProfileClient = () => {
               className="border rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-orange-500 transition duration-200"
             />
           </div>
+
           <div>
             <label className="block text-sm font-medium mb-2">Adresse</label>
             <input
@@ -278,6 +293,7 @@ const UpdateProfileClient = () => {
               className="border rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-orange-500 transition duration-200"
             />
           </div>
+
           <div>
             <label className="block text-sm font-medium mb-2">
               Numéro de téléphone
@@ -290,6 +306,7 @@ const UpdateProfileClient = () => {
               className="border rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-orange-500 transition duration-200"
             />
           </div>
+
           {errorMessages.length > 0 && (
             <div className="text-red-600 text-sm">
               <ul>
@@ -299,7 +316,8 @@ const UpdateProfileClient = () => {
               </ul>
             </div>
           )}
-          <div className="flex justify-between">
+
+          <div className="flex justify-between mt-4">
             <button
               type="button"
               onClick={handleBackHome}
@@ -314,9 +332,11 @@ const UpdateProfileClient = () => {
               {loading ? "Mise à jour..." : "Mettre à jour"}
             </button>
           </div>
+
           {isUpdated && (
-            <div className="text-green-600 mt-4">
-              <FaCheckCircle /> Profil mis à jour avec succès !
+            <div className="text-green-600 mt-4 flex items-center">
+              <FaCheckCircle className="mr-2" />
+              Profil mis à jour avec succès !
             </div>
           )}
         </form>
