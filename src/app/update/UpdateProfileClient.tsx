@@ -5,10 +5,16 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { FaCheckCircle } from "react-icons/fa";
 
-const usersData = require('/public/data.json');
+const usersData = require("/public/data.json");
 
-const geocodeAddress = async (adresse: string): Promise<{ lat: number, lon: number }> => {
-  const response = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(adresse)}&limit=1`);
+const geocodeAddress = async (
+  adresse: string
+): Promise<{ lat: number; lon: number }> => {
+  const response = await fetch(
+    `https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(
+      adresse
+    )}&limit=1`
+  );
   if (!response.ok) throw new Error("Erreur lors de l'appel à l'API");
   const data = await response.json();
   if (data.features && data.features.length > 0) {
@@ -18,11 +24,21 @@ const geocodeAddress = async (adresse: string): Promise<{ lat: number, lon: numb
   throw new Error("Adresse non trouvée ou invalide");
 };
 
-const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+const calculateDistance = (
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+): number => {
   const R = 6371; // Rayon de la Terre en kilomètres
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 };
@@ -42,13 +58,15 @@ const UpdateProfileClient = () => {
 
   const [isUpdated, setIsUpdated] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [errorMessages, setErrorMessages] = useState<string[]>([]); // Tableau pour gérer plusieurs messages d'erreur
+  const [errorMessages, setErrorMessages] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       if (status === "authenticated" && session?.user?.email) {
         try {
-          const user = usersData.users.find((u: any) => u.email === session?.user?.email);
+          const user = usersData.users.find(
+            (u: any) => u.email === session?.user?.email
+          );
           if (user) {
             setFormData({
               email: user.email || session.user.email || "",
@@ -61,9 +79,9 @@ const UpdateProfileClient = () => {
           } else {
             const fullName = session.user.name || "";
             const nameParts = fullName.split(" ");
-            const prenom = nameParts[0]; // Premier mot comme prénom
-            const nom = nameParts.slice(1).join(" "); // Reste comme nom
-            
+            const prenom = nameParts[0];
+            const nom = nameParts.slice(1).join(" ");
+
             setFormData({
               email: session.user.email || "",
               prenom: prenom,
@@ -74,13 +92,16 @@ const UpdateProfileClient = () => {
             });
           }
         } catch (error) {
-          console.error("Erreur lors de la récupération des données utilisateur :", error);
+          console.error(
+            "Erreur lors de la récupération des données utilisateur :",
+            error
+          );
         }
       } else if (status === "unauthenticated") {
         router.push("/");
       }
     };
-    
+
     fetchData();
   }, [session, status, router]);
 
@@ -90,7 +111,8 @@ const UpdateProfileClient = () => {
   };
 
   const validateFormData = () => {
-    const { email, prenom, nom, dateDeNaissance, adresse, numeroDeTelephone } = formData;
+    const { email, prenom, nom, dateDeNaissance, adresse, numeroDeTelephone } =
+      formData;
     const today = new Date();
     const birthDate = new Date(dateDeNaissance);
     const newErrorMessages: string[] = [];
@@ -98,26 +120,33 @@ const UpdateProfileClient = () => {
     if (!prenom) newErrorMessages.push("Le prénom est requis.");
     if (!nom) newErrorMessages.push("Le nom est requis.");
     if (!email) newErrorMessages.push("L'email est requis.");
-    if (!dateDeNaissance) newErrorMessages.push("La date de naissance est requise.");
-    if (birthDate > today) newErrorMessages.push("La date de naissance ne peut pas être dans le futur.");
+    if (!dateDeNaissance)
+      newErrorMessages.push("La date de naissance est requise.");
+    if (birthDate > today)
+      newErrorMessages.push(
+        "La date de naissance ne peut pas être dans le futur."
+      );
     if (!adresse) newErrorMessages.push("L'adresse est requise.");
-    if (!numeroDeTelephone) newErrorMessages.push("Le numéro de téléphone est requis.");
+    if (!numeroDeTelephone)
+      newErrorMessages.push("Le numéro de téléphone est requis.");
 
-    setErrorMessages(newErrorMessages); // Met à jour les messages d'erreur
-    return newErrorMessages.length === 0; // Retourne true si aucune erreur
+    setErrorMessages(newErrorMessages);
+    return newErrorMessages.length === 0;
   };
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setLoading(true);
-    setErrorMessages([]); // Réinitialiser les messages d'erreur
+    setErrorMessages([]);
     try {
       if (!validateFormData()) {
         setLoading(false);
         return;
       }
 
-      const user = usersData.users.find((u: any) => u.email === session?.user?.email);
+      const user = usersData.users.find(
+        (u: any) => u.email === session?.user?.email
+      );
 
       if (
         user &&
@@ -128,7 +157,9 @@ const UpdateProfileClient = () => {
         formData.adresse === user.adresse &&
         formData.numeroDeTelephone === user.numeroDeTelephone
       ) {
-        setErrorMessages(["Aucune modification apportée. Profil déjà à jour !"]);
+        setErrorMessages([
+          "Aucune modification apportée. Profil déjà à jour !",
+        ]);
         setIsUpdated(true);
         setLoading(false);
         return;
@@ -141,32 +172,36 @@ const UpdateProfileClient = () => {
       const distance = calculateDistance(lat, lon, parisLat, parisLon);
 
       if (distance > 50) {
-        setErrorMessages(["L'adresse doit être située à moins de 50 km de Paris."]);
+        setErrorMessages([
+          "L'adresse doit être située à moins de 50 km de Paris.",
+        ]);
         setLoading(false);
         return;
       }
 
-      const response = await fetch('/api/updateprofile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/updateprofile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
       const result = await response.json();
-      if (!response.ok) throw new Error(result.error || 'Mise à jour échouée');
+      if (!response.ok) throw new Error(result.error || "Mise à jour échouée");
 
       alert(result.message);
       setIsUpdated(true);
     } catch (error) {
-      console.error('Erreur:', error);
-      setErrorMessages(['Une erreur est survenue : ' + (error.message || 'Erreur inconnue.')]);
+      console.error("Erreur:", error);
+      setErrorMessages([
+        "Une erreur est survenue : " + (error?.message || error),
+      ]);
     } finally {
       setLoading(false);
     }
   };
 
   const handleBackHome = () => {
-    router.push('/'); // Naviguer vers la page d'accueil
+    router.push("/");
   };
 
   if (status === "loading") {
@@ -179,12 +214,14 @@ const UpdateProfileClient = () => {
   }
 
   return (
-    <div 
+    <div
       className="flex items-center justify-center min-h-screen bg-cover bg-center"
-      style={{ backgroundImage: "url('/images/paris-4.jpg')" }} // Remplacez par le chemin de votre image
+      style={{ backgroundImage: "url('/images/paris-4.jpg')" }}
     >
       <div className="max-w-md w-full p-6 bg-white rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold mb-6 text-center">Mettre à jour le profil</h1>
+        <h1 className="text-3xl font-bold mb-6 text-center">
+          Mettre à jour le profil
+        </h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -216,11 +253,13 @@ const UpdateProfileClient = () => {
               value={formData.email}
               onChange={handleInputChange}
               className="border rounded-lg px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-orange-500 transition duration-200"
-              disabled // Désactiver le champ email si nécessaire
+              disabled
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">Date de naissance</label>
+            <label className="block text-sm font-medium mb-2">
+              Date de naissance
+            </label>
             <input
               type="date"
               name="dateDeNaissance"
@@ -240,7 +279,9 @@ const UpdateProfileClient = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">Numéro de téléphone</label>
+            <label className="block text-sm font-medium mb-2">
+              Numéro de téléphone
+            </label>
             <input
               type="tel"
               name="numeroDeTelephone"
@@ -259,14 +300,25 @@ const UpdateProfileClient = () => {
             </div>
           )}
           <div className="flex justify-between">
-            <button type="button" onClick={handleBackHome} className="text-orange-500 hover:underline">
+            <button
+              type="button"
+              onClick={handleBackHome}
+              className="text-orange-500 hover:underline"
+            >
               Retour
             </button>
-            <button type="submit" className="bg-orange-500 text-white rounded-lg px-4 py-2 hover:bg-orange-600 transition duration-200">
+            <button
+              type="submit"
+              className="bg-orange-500 text-white rounded-lg px-4 py-2 hover:bg-orange-600 transition duration-200"
+            >
               {loading ? "Mise à jour..." : "Mettre à jour"}
             </button>
           </div>
-          {isUpdated && <div className="text-green-600 mt-4"><FaCheckCircle /> Profil mis à jour avec succès !</div>}
+          {isUpdated && (
+            <div className="text-green-600 mt-4">
+              <FaCheckCircle /> Profil mis à jour avec succès !
+            </div>
+          )}
         </form>
       </div>
     </div>
