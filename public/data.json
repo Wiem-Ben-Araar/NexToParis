@@ -1,0 +1,28 @@
+{
+  "users": [
+    {
+      "email": "wiembnaraar825@gmail.com",
+      "prenom": "Wieme",
+      "nom": "Ben Araar",
+      "dateDeNaissance": "1992-07-15",
+      "adresse": "Sousse, Tunisia",
+      "numeroDeTelephone": "90180420"
+    },
+    {
+      "email": "wiembenaraar2@gmail.com",
+      "prenom": "Wiem",
+      "nom": "Ben Araar",
+      "dateDeNaissance": "2024-10-04",
+      "adresse": "Tunis, Tunisia",
+      "numeroDeTelephone": "90180310"
+    },
+    {
+      "email": "wiembnaraar82@gmail.com",
+      "prenom": "Wiem",
+      "nom": "Ben Araar",
+      "dateDeNaissance": "2024-10-03",
+      "adresse": "Champs-Élysées, Pari",
+      "numeroDeTelephone": "90118888"
+    }
+  ]
+}
