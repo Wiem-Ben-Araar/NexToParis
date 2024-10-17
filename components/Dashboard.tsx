@@ -67,7 +67,7 @@ const Dashboard = () => {
               animate={{ opacity: 1, translateY: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              Vous n'êtes pas connecté.
+              Vous n&apos;êtes pas connecté.
             </motion.p>
             <motion.button
               onClick={() => signIn("google")}
