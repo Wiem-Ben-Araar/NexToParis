@@ -193,7 +193,7 @@ const UpdateProfileClient = () => {
     } catch (error) {
       console.error("Erreur:", error);
       setErrorMessages([
-        "Une erreur est survenue : " + (error?.message || error),
+        "Une erreur est survenue : " + (error),
       ]);
     } finally {
       setLoading(false);
