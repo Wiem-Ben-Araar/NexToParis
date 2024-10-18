@@ -20,12 +20,12 @@ interface ExistingUser {
 export const authOptions: NextAuthOptions = {
   providers: [
     GithubProvider({
-      clientId: process.env.GITHUB_ID as string,
-      clientSecret: process.env.GITHUB_SECRET as string,
+      clientId: "Ov23lidlDeg3dUqvwQpZ",
+      clientSecret: "1f6c291d04a38dcd68fbf71150d315afb60565a1",
     }),
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      clientId: "226389726594-fuuff9p3e3trhqppjt4mpmmvivu5jh97.apps.googleusercontent.com",
+      clientSecret: "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",
     }),
   ],
   callbacks: {
